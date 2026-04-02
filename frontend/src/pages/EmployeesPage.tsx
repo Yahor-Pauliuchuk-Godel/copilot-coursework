@@ -2,26 +2,25 @@ import { useEffect, useState } from 'react';
 
 const API_BASE = 'https://localhost:5001';
 
-interface Item {
+interface Employee {
   id: number;
   name: string;
-  description: string;
-  price: number;
+  dateOfBirth: string;
 }
 
-export default function ItemsPage() {
-  const [items, setItems] = useState<Item[]>([]);
+export default function EmployeesPage() {
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/items`)
+    fetch(`${API_BASE}/api/employees`)
       .then((res) => {
         if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        return res.json() as Promise<Item[]>;
+        return res.json() as Promise<Employee[]>;
       })
       .then((data) => {
-        setItems(data);
+        setEmployees(data);
         setLoading(false);
       })
       .catch((err: Error) => {
@@ -43,7 +42,7 @@ export default function ItemsPage() {
   if (error) {
     return (
       <div className="alert alert-danger" role="alert">
-        <strong>Could not load items.</strong> {error}
+        <strong>Could not load employees.</strong> {error}
         <p className="mt-2 mb-0 small">
           Make sure the backend is running on{' '}
           <code>{API_BASE}</code>.
@@ -55,14 +54,14 @@ export default function ItemsPage() {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Items</h2>
-        <span className="badge bg-secondary">{items.length} total</span>
+        <h2 className="mb-0">Employees</h2>
+        <span className="badge bg-secondary">{employees.length} total</span>
       </div>
 
-      {items.length === 0 ? (
+      {employees.length === 0 ? (
         <div className="alert alert-info">
-          No items found. Add some via the API with a POST to{' '}
-          <code>{API_BASE}/api/items</code>.
+          No employees found. Add some via the API with a POST to{' '}
+          <code>{API_BASE}/api/employees</code>.
         </div>
       ) : (
         <div className="table-responsive">
@@ -71,17 +70,15 @@ export default function ItemsPage() {
               <tr>
                 <th>#</th>
                 <th>Name</th>
-                <th>Description</th>
-                <th className="text-end">Price</th>
+                <th>Date of Birth</th>
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.id}</td>
-                  <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td className="text-end">${item.price.toFixed(2)}</td>
+              {employees.map((employee) => (
+                <tr key={employee.id}>
+                  <td>{employee.id}</td>
+                  <td>{employee.name}</td>
+                  <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
                 </tr>
               ))}
             </tbody>

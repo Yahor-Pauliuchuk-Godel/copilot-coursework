@@ -13,7 +13,7 @@ export default function HomePage() {
           </h1>
           <p className="card-text text-muted mb-4">
             A minimal React + .NET 8 full-stack template. Browse the{' '}
-            <strong>Items</strong> page to see data fetched from the backend API.
+            <strong>Employees</strong> page to see data fetched from the backend API.
           </p>
 
           <div className="d-flex justify-content-center align-items-center gap-3 mb-4">
@@ -35,8 +35,8 @@ export default function HomePage() {
             Counter powered by <code>useContext</code> + <code>useState</code>
           </p>
 
-          <Link to="/items" className="btn btn-primary btn-lg">
-            View Items →
+          <Link to="/employees" className="btn btn-primary btn-lg">
+            View Employees →
           </Link>
         </div>
       </div>

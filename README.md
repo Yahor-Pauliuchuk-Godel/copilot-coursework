@@ -14,11 +14,11 @@ copilot-coursework/
 │   ├── appsettings.json
 │   ├── appsettings.Development.json
 │   ├── Controllers/
-│   │   └── ItemsController.cs
+│   │   └── EmployeesController.cs
 │   ├── Data/
 │   │   └── AppDbContext.cs
 │   └── Models/
-│       └── Item.cs
+│       └── Employee.cs
 └── frontend/
     ├── index.html
     ├── package.json
@@ -34,7 +34,7 @@ copilot-coursework/
         │   └── AppContext.tsx  ← Global state via useState + useContext
         └── pages/
             ├── HomePage.tsx
-            └── ItemsPage.tsx   ← Fetches /api/items and renders a table
+            └── EmployeesPage.tsx   ← Fetches /api/employees and renders a table
 ```
 
 ---
@@ -86,7 +86,7 @@ dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-This creates the `StarterDb` database and the `Items` table.
+This creates the `StarterDb` database and the `Employees` table.
 
 ### 1.4 Run the backend
 
@@ -102,22 +102,22 @@ The API listens on:
 
 | Method | URL | Description |
 |---|---|---|
-| `GET` | `/api/items` | List all items |
-| `GET` | `/api/items/{id}` | Get a single item |
-| `POST` | `/api/items` | Create an item |
-| `PUT` | `/api/items/{id}` | Update an item |
-| `DELETE` | `/api/items/{id}` | Delete an item |
+| `GET` | `/api/employees` | List all employees |
+| `GET` | `/api/employees/{id}` | Get a single employee |
+| `POST` | `/api/employees` | Create an employee |
+| `PUT` | `/api/employees/{id}` | Update an employee |
+| `DELETE` | `/api/employees/{id}` | Delete an employee |
 
 #### Quick test (PowerShell)
 
 ```powershell
-# Create an item
-Invoke-RestMethod -Method Post -Uri https://localhost:5001/api/items `
+# Create an employee
+Invoke-RestMethod -Method Post -Uri https://localhost:5001/api/employees `
   -ContentType "application/json" `
-  -Body '{"name":"Widget","description":"A sample widget","price":9.99}'
+  -Body '{"name":"Jane Smith","dateOfBirth":"1990-06-15"}'
 
-# List all items
-Invoke-RestMethod https://localhost:5001/api/items
+# List all employees
+Invoke-RestMethod https://localhost:5001/api/employees
 ```
 
 ---
@@ -161,7 +161,7 @@ cd frontend
 npm run dev
 ```
 
-Then open **http://localhost:5173** in your browser. The **Items** page calls `https://localhost:5001/api/items` via the Fetch API and renders the results in a Bootstrap table.
+Then open **http://localhost:5173** in your browser. The **Employees** page calls `https://localhost:5001/api/employees` via the Fetch API and renders the results in a Bootstrap table.
 
 ---
 
@@ -172,5 +172,5 @@ Then open **http://localhost:5173** in your browser. The **Items** page calls `h
 - **State management** uses `useState` + `useContext` only — no Redux or Zustand.
 - **HTTP calls** use the native `fetch` API only — no axios.
 - **CORS** is locked to `http://localhost:5173` in `Program.cs`.
-- **EF Core Code-First** — edit `Models/Item.cs`, then run `dotnet ef migrations add <Name>` + `dotnet ef database update` to evolve the schema.
+- **EF Core Code-First** — edit `Models/Employee.cs`, then run `dotnet ef migrations add <Name>` + `dotnet ef database update` to evolve the schema.
 

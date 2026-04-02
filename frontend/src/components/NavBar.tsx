@@ -38,9 +38,9 @@ export default function NavBar() {
                 className={({ isActive }) =>
                   'nav-link' + (isActive ? ' active' : '')
                 }
-                to="/items"
+                to="/employees"
               >
-                Items
+                Employees
               </NavLink>
             </li>
           </ul>
