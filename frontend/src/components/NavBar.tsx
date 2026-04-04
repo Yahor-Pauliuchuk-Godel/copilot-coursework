@@ -28,17 +28,6 @@ export default function NavBar() {
                   'nav-link' + (isActive ? ' active' : '')
                 }
                 to="/"
-                end
-              >
-                Home
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                className={({ isActive }) =>
-                  'nav-link' + (isActive ? ' active' : '')
-                }
-                to="/employees"
               >
                 Employees
               </NavLink>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const API_BASE = 'https://localhost:5001';
 
@@ -12,6 +12,18 @@ export default function EmployeesPage() {
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const menuRef = useRef<HTMLTableSectionElement>(null);
+
+  useEffect(() => {
+    function handleOutsideClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpenMenuId(null);
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
 
   useEffect(() => {
     fetch(`${API_BASE}/api/employees`)
@@ -64,26 +76,52 @@ export default function EmployeesPage() {
           <code>{API_BASE}/api/employees</code>.
         </div>
       ) : (
-        <div className="table-responsive">
-          <table className="table table-striped table-hover align-middle">
-            <thead className="table-dark">
-              <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Date of Birth</th>
+        <table className="table table-striped table-hover align-middle">
+          <thead className="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Date of Birth</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody ref={menuRef}>
+            {employees.map((employee) => (
+              <tr key={employee.id}>
+                <td>{employee.id}</td>
+                <td>{employee.name}</td>
+                <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
+                <td className="text-end">
+                  <div className="dropdown">
+                    <button
+                      className="btn btn-link p-0 text-body text-decoration-none"
+                      onClick={() =>
+                        setOpenMenuId(openMenuId === employee.id ? null : employee.id)
+                      }
+                      aria-expanded={openMenuId === employee.id}
+                    >
+                      &#x22EE;
+                    </button>
+                    <ul
+                      className={`dropdown-menu dropdown-menu-end${openMenuId === employee.id ? ' show' : ''}`}
+                    >
+                      <li>
+                        <button className="dropdown-item" onClick={() => {}}>
+                          Open
+                        </button>
+                      </li>
+                      <li>
+                        <button className="dropdown-item text-danger" onClick={() => {}}>
+                          Delete
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {employees.map((employee) => (
-                <tr key={employee.id}>
-                  <td>{employee.id}</td>
-                  <td>{employee.name}</td>
-                  <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
