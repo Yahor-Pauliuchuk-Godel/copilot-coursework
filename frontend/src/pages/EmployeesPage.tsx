@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import AddEmployeeModal from '../components/AddEmployeeModal';
 
 const API_BASE = 'https://localhost:5001';
 
@@ -15,6 +16,7 @@ export default function EmployeesPage() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [showAddModal, setShowAddModal] = useState(false);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useEffect(() => {
@@ -65,6 +67,10 @@ export default function EmployeesPage() {
     );
   }
 
+  function handleEmployeeAdded(employee: Employee) {
+    setEmployees((prev) => [...prev, employee]);
+  }
+
   const totalPages = Math.max(1, Math.ceil(employees.length / itemsPerPage));
   const pagedEmployees = employees.slice(
     (currentPage - 1) * itemsPerPage,
@@ -73,8 +79,21 @@ export default function EmployeesPage() {
 
   return (
     <div>
-      <div className="mb-3">
+      {showAddModal && (
+        <AddEmployeeModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleEmployeeAdded}
+        />
+      )}
+
+      <div className="mb-3 d-flex justify-content-between align-items-center">
         <h2 className="mb-0">Employees</h2>
+        <button
+          className="btn btn-dark"
+          onClick={() => setShowAddModal(true)}
+        >
+          Add Employee
+        </button>
       </div>
 
       {employees.length === 0 ? (
