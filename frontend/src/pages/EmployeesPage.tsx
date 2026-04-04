@@ -13,6 +13,8 @@ export default function EmployeesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useEffect(() => {
@@ -63,11 +65,16 @@ export default function EmployeesPage() {
     );
   }
 
+  const totalPages = Math.max(1, Math.ceil(employees.length / itemsPerPage));
+  const pagedEmployees = employees.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
   return (
     <div>
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="mb-3">
         <h2 className="mb-0">Employees</h2>
-        <span className="badge bg-secondary">{employees.length} total</span>
       </div>
 
       {employees.length === 0 ? (
@@ -76,6 +83,7 @@ export default function EmployeesPage() {
           <code>{API_BASE}/api/employees</code>.
         </div>
       ) : (
+        <>
         <table className="table table-striped table-hover align-middle">
           <thead className="table-dark">
             <tr>
@@ -86,7 +94,7 @@ export default function EmployeesPage() {
             </tr>
           </thead>
           <tbody ref={menuRef}>
-            {employees.map((employee) => (
+            {pagedEmployees.map((employee) => (
               <tr key={employee.id}>
                 <td>{employee.id}</td>
                 <td>{employee.name}</td>
@@ -122,6 +130,67 @@ export default function EmployeesPage() {
             ))}
           </tbody>
         </table>
+
+        <div className="d-flex justify-content-end align-items-center gap-3 mt-2">
+          <div className="d-flex align-items-center gap-2">
+            <label htmlFor="itemsPerPage" className="form-label mb-0 small">
+              Rows per page
+            </label>
+            <select
+              id="itemsPerPage"
+              className="form-select form-select-sm w-auto"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={3}>3</option>
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+            </select>
+          </div>
+
+          <span className="small">
+            Page {currentPage} of {totalPages}
+          </span>
+
+          <div className="btn-group btn-group-sm">
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+              title="First page"
+            >
+              «
+            </button>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => setCurrentPage((p) => p - 1)}
+              disabled={currentPage === 1}
+              title="Previous page"
+            >
+              ‹
+            </button>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => setCurrentPage((p) => p + 1)}
+              disabled={currentPage === totalPages}
+              title="Next page"
+            >
+              ›
+            </button>
+            <button
+              className="btn btn-outline-secondary"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+              title="Last page"
+            >
+              »
+            </button>
+          </div>
+        </div>
+        </>
       )}
     </div>
   );

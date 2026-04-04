@@ -174,3 +174,9 @@ Then open **http://localhost:5173** in your browser. The **Employees** page call
 - **CORS** is locked to `http://localhost:5173` in `Program.cs`.
 - **EF Core Code-First** — edit `Models/Employee.cs`, then run `dotnet ef migrations add <Name>` + `dotnet ef database update` to evolve the schema.
 
+---
+
+## To Do
+
+- **Server-side pagination** — the Employees page currently fetches all rows at once and paginates client-side. Move pagination to the backend by accepting `page` and `pageSize` query parameters on `GET /api/employees` and returning only the requested slice.
+
