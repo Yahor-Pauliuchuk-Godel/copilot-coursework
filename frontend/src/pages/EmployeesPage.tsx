@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import AddEmployeeModal from '../components/AddEmployeeModal';
+import { useTheme } from '../context/ThemeContext';
 
 const API_BASE = 'https://localhost:5001';
 
@@ -18,6 +19,7 @@ export default function EmployeesPage() {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [showAddModal, setShowAddModal] = useState(false);
   const menuRef = useRef<HTMLTableSectionElement>(null);
+  const { theme } = useTheme();
 
   useEffect(() => {
     function handleOutsideClick(e: MouseEvent) {
@@ -89,7 +91,7 @@ export default function EmployeesPage() {
       <div className="mb-3 d-flex justify-content-between align-items-center">
         <h2 className="mb-0">Employees</h2>
         <button
-          className="btn btn-dark"
+          className={`btn ${theme === 'dark' ? 'btn-light' : 'btn-dark'}`}
           onClick={() => setShowAddModal(true)}
         >
           Add Employee
