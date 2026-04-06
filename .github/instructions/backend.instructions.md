@@ -1,4 +1,8 @@
-# Copilot Instructions
+---
+description: "Use when working on backend code, EF Core models, migrations, or database schema changes."
+applyTo: "backend/**"
+---
+# Backend Instructions
 
 ## EF Core Migrations — CRITICAL RULE
 
