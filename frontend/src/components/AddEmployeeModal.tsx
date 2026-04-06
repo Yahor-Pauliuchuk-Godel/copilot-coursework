@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import config from '../config';
 
-const API_BASE = 'https://localhost:5001';
+const API_BASE = config.apiBaseUrl;
 
 const NAME_REGEX = /^[a-zA-Z\s'\-]*$/;
 

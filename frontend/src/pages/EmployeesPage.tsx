@@ -1,19 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import AddEmployeeModal from '../components/AddEmployeeModal';
+import Pagination from '../components/Pagination';
+import RowActionsMenu from '../components/RowActionsMenu';
 import { useTheme } from '../context/ThemeContext';
+import { useEmployees } from '../hooks/useEmployees';
+import useClickOutside from '../hooks/useClickOutside';
+import config from '../config';
 
-const API_BASE = 'https://localhost:5001';
+const API_BASE = config.apiBaseUrl;
 
-interface Employee {
-  id: number;
-  name: string;
-  dateOfBirth: string;
-}
-
-export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const EmployeesPage = () => {
+  const { employees, isLoading, error } = useEmployees();
+  const queryClient = useQueryClient();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -21,33 +20,9 @@ export default function EmployeesPage() {
   const menuRef = useRef<HTMLTableSectionElement>(null);
   const { theme } = useTheme();
 
-  useEffect(() => {
-    function handleOutsideClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpenMenuId(null);
-      }
-    }
-    document.addEventListener('mousedown', handleOutsideClick);
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, []);
+  useClickOutside(menuRef, () => setOpenMenuId(null));
 
-  useEffect(() => {
-    fetch(`${API_BASE}/api/employees`)
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        return res.json() as Promise<Employee[]>;
-      })
-      .then((data) => {
-        setEmployees(data);
-        setLoading(false);
-      })
-      .catch((err: Error) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="d-flex justify-content-center py-5">
         <div className="spinner-border text-primary" role="status">
@@ -60,7 +35,7 @@ export default function EmployeesPage() {
   if (error) {
     return (
       <div className="alert alert-danger" role="alert">
-        <strong>Could not load employees.</strong> {error}
+        <strong>Could not load employees.</strong> {error.message}
         <p className="mt-2 mb-0 small">
           Make sure the backend is running on{' '}
           <code>{API_BASE}</code>.
@@ -69,9 +44,9 @@ export default function EmployeesPage() {
     );
   }
 
-  function handleEmployeeAdded(employee: Employee) {
-    setEmployees((prev) => [...prev, employee]);
-  }
+  const handleEmployeeAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['employees'] });
+  };
 
   const totalPages = Math.max(1, Math.ceil(employees.length / itemsPerPage));
   const pagedEmployees = employees.slice(
@@ -121,98 +96,29 @@ export default function EmployeesPage() {
                 <td>{employee.name}</td>
                 <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
                 <td className="text-end">
-                  <div className="dropdown">
-                    <button
-                      className="btn btn-link p-0 text-body text-decoration-none"
-                      onClick={() =>
-                        setOpenMenuId(openMenuId === employee.id ? null : employee.id)
-                      }
-                      aria-expanded={openMenuId === employee.id}
-                    >
-                      &#x22EE;
-                    </button>
-                    <ul
-                      className={`dropdown-menu dropdown-menu-end${openMenuId === employee.id ? ' show' : ''}`}
-                    >
-                      <li>
-                        <button className="dropdown-item" onClick={() => {}}>
-                          Open
-                        </button>
-                      </li>
-                      <li>
-                        <button className="dropdown-item text-danger" onClick={() => {}}>
-                          Delete
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                  <RowActionsMenu
+                    isOpen={openMenuId === employee.id}
+                    onToggle={() => setOpenMenuId(openMenuId === employee.id ? null : employee.id)}
+                    onOpen={() => {}}
+                    onDelete={() => {}}
+                  />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
 
-        <div className="d-flex justify-content-end align-items-center gap-3 mt-2">
-          <div className="d-flex align-items-center gap-2">
-            <label htmlFor="itemsPerPage" className="form-label mb-0 small">
-              Rows per page
-            </label>
-            <select
-              id="itemsPerPage"
-              className="form-select form-select-sm w-auto"
-              value={itemsPerPage}
-              onChange={(e) => {
-                setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={3}>3</option>
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-            </select>
-          </div>
-
-          <span className="small">
-            Page {currentPage} of {totalPages}
-          </span>
-
-          <div className="btn-group btn-group-sm">
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setCurrentPage(1)}
-              disabled={currentPage === 1}
-              title="First page"
-            >
-              «
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setCurrentPage((p) => p - 1)}
-              disabled={currentPage === 1}
-              title="Previous page"
-            >
-              ‹
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setCurrentPage((p) => p + 1)}
-              disabled={currentPage === totalPages}
-              title="Next page"
-            >
-              ›
-            </button>
-            <button
-              className="btn btn-outline-secondary"
-              onClick={() => setCurrentPage(totalPages)}
-              disabled={currentPage === totalPages}
-              title="Last page"
-            >
-              »
-            </button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          itemsPerPage={itemsPerPage}
+          onPageChange={setCurrentPage}
+          onItemsPerPageChange={(n) => { setItemsPerPage(n); setCurrentPage(1); }}
+        />
         </>
       )}
     </div>
   );
-}
+};
+
+export default EmployeesPage;

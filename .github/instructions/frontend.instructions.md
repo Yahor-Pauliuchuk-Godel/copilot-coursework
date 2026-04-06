@@ -18,6 +18,22 @@ function MyComponent() { ... }
 function handleClick() { ... }
 ```
 
+## Styling — CRITICAL RULE
+
+**Never use inline CSS** (`style={{ ... }}`). Always prefer a Bootstrap utility class. If no Bootstrap equivalent exists, add the rule to a dedicated `.css` file and import it into the component.
+
+```tsx
+// ✓ Correct — Bootstrap utility class
+<nav className="navbar shadow-sm">
+
+// ✓ Correct — custom class in a separate CSS file
+import './Header.css';
+<nav className="navbar header-shadow">
+
+// ✗ Incorrect — inline style
+<nav style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.15)' }}>
+```
+
 ## Custom Hooks — Best Practices
 
 Extract logic into a custom hook when stateful or side-effect logic is reused across multiple components or becomes complex enough to obscure a component's rendering intent.
@@ -36,32 +52,28 @@ Extract logic into a custom hook when stateful or side-effect logic is reused ac
 - Handle its own cleanup (unsubscribe, abort fetch, clear timers) inside `useEffect`'s return function.
 - Never return JSX — a hook is not a component.
 
-```tsx
-// ✓ Correct
-const useEmployees = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/employees', { signal: controller.signal })
-      .then(res => res.json())
-      .then(setEmployees);
-    return () => controller.abort();
-  }, []);
-
-  return employees;
-};
-
-// ✗ Incorrect — logic mixed directly into the component, not reusable
-const EmployeesPage = () => {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  useEffect(() => {
-    fetch('/api/employees').then(res => res.json()).then(setEmployees);
-  }, []);
-  // ...
-};
-```
-
 **Dependency arrays:**
 - Always declare every reactive value used inside `useEffect`/`useMemo`/`useCallback` in the dependency array.
 - Use the `exhaustive-deps` ESLint rule to catch omissions automatically.
+
+## Environment Variables — CRITICAL RULE
+
+**Never hardcode API URLs or other environment-specific values** as string literals in source files. Always expose them through the central configuration file.
+
+### Vite `.env` files
+
+- Vite only exposes variables prefixed with `VITE_` to the client bundle. Variables without this prefix are **not** available at runtime.
+- Store values in `frontend/.env` for local development (this file is gitignored).
+- Commit a `frontend/.env.example` with placeholder or default values so other developers know which variables are required.
+
+**File conventions:**
+- `frontend/.env` — local overrides, **gitignored**, never committed
+- `frontend/.env.example` — committed template listing all required `VITE_*` variables
+
+## Data Fetching — TanStack Query
+
+**Always use `@tanstack/react-query` for server data fetching** — never use raw `useEffect` + `useState` to fetch data from an API.
+
+- Place all query logic in custom hooks inside `src/hooks/`, using `useQuery` from `@tanstack/react-query`.
+- Use a stable query key array that uniquely identifies the resource (e.g., `['employees']`).
+- After a mutation (create / update / delete), call `useQueryClient().invalidateQueries({ queryKey: [...] })` to trigger a refetch and keep the UI consistent with the server.
