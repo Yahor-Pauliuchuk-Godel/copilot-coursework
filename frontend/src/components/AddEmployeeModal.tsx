@@ -3,7 +3,6 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import config from '../config';
 import type { Employee } from '../hooks/useEmployees';
-import { useTheme } from '../context/ThemeContext';
 import './AddEmployeeModal.css';
 
 const API_BASE = config.apiBaseUrl;
@@ -16,7 +15,6 @@ interface Props {
 }
 
 const AddEmployeeModal = ({ onClose, onAdd }: Props) => {
-  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
@@ -137,7 +135,7 @@ const AddEmployeeModal = ({ onClose, onAdd }: Props) => {
               </button>
               <button
                 type="button"
-                className={`btn ${theme === 'dark' ? 'btn-light' : 'btn-dark'}`}
+                className="btn btn-outline-primary"
                 onClick={handleAdd}
                 disabled={!isValid || submitting}
               >

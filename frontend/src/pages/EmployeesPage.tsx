@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import AddEmployeeModal from '../components/AddEmployeeModal';
 import Pagination from '../components/Pagination';
 import RowActionsMenu from '../components/RowActionsMenu';
-import { useTheme } from '../context/ThemeContext';
 import { useEmployees } from '../hooks/useEmployees';
 import useClickOutside from '../hooks/useClickOutside';
 import useLocalStorage from '../hooks/useLocalStorage';
@@ -14,12 +14,12 @@ const API_BASE = config.apiBaseUrl;
 const EmployeesPage = () => {
   const { employees, isLoading, error } = useEmployees();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useLocalStorage('itemsPerPage', 5);
   const [showAddModal, setShowAddModal] = useState(false);
   const menuRef = useRef<HTMLTableSectionElement>(null);
-  const { theme } = useTheme();
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
 
@@ -67,7 +67,7 @@ const EmployeesPage = () => {
       <div className="mb-3 d-flex justify-content-between align-items-center">
         <h2 className="mb-0">Employees</h2>
         <button
-          className={`btn ${theme === 'dark' ? 'btn-light' : 'btn-dark'}`}
+          className="btn btn-outline-primary"
           onClick={() => setShowAddModal(true)}
         >
           Add Employee
@@ -94,13 +94,20 @@ const EmployeesPage = () => {
             {pagedEmployees.map((employee) => (
               <tr key={employee.id}>
                 <td>{employee.id}</td>
-                <td>{employee.name}</td>
+                <td>
+                  <button
+                    className="btn btn-link p-0 text-body text-decoration-underline"
+                    onClick={() => navigate(`/employees/${employee.id}`)}
+                  >
+                    {employee.name}
+                  </button>
+                </td>
                 <td>{new Date(employee.dateOfBirth).toLocaleDateString()}</td>
                 <td className="text-end">
                   <RowActionsMenu
                     isOpen={openMenuId === employee.id}
                     onToggle={() => setOpenMenuId(openMenuId === employee.id ? null : employee.id)}
-                    onOpen={() => {}}
+                    onOpen={() => navigate(`/employees/${employee.id}`)}
                     onDelete={() => {}}
                   />
                 </td>
