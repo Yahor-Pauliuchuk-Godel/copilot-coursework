@@ -2,30 +2,28 @@ import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import config from '../config';
+import type { Employee } from '../hooks/useEmployees';
+import { useTheme } from '../context/ThemeContext';
+import './AddEmployeeModal.css';
 
 const API_BASE = config.apiBaseUrl;
 
 const NAME_REGEX = /^[a-zA-Z\s'\-]*$/;
-
-interface Employee {
-  id: number;
-  name: string;
-  dateOfBirth: string;
-}
 
 interface Props {
   onClose: () => void;
   onAdd: (employee: Employee) => void;
 }
 
-export default function AddEmployeeModal({ onClose, onAdd }: Props) {
+const AddEmployeeModal = ({ onClose, onAdd }: Props) => {
+  const { theme } = useTheme();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | null>(null);
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
 
-  function handleNameChange(value: string) {
+  const handleNameChange = (value: string) => {
     setName(value);
     if (value.length > 0 && !NAME_REGEX.test(value)) {
       setNameError('Name must contain only letters, spaces, hyphens, or apostrophes.');
@@ -36,7 +34,7 @@ export default function AddEmployeeModal({ onClose, onAdd }: Props) {
 
   const isValid = name.trim().length > 0 && nameError === null && dateOfBirth !== null;
 
-  async function handleAdd() {
+  const handleAdd = async () => {
     if (!isValid || !dateOfBirth) return;
 
     setSubmitting(true);
@@ -70,9 +68,8 @@ export default function AddEmployeeModal({ onClose, onAdd }: Props) {
     <>
       {/* Backdrop */}
       <div
-        className="modal-backdrop fade show"
+        className="modal-backdrop fade show modal-backdrop-clickable"
         onClick={onClose}
-        style={{ cursor: 'default' }}
       />
 
       {/* Modal */}
@@ -140,7 +137,7 @@ export default function AddEmployeeModal({ onClose, onAdd }: Props) {
               </button>
               <button
                 type="button"
-                className="btn btn-dark"
+                className={`btn ${theme === 'dark' ? 'btn-light' : 'btn-dark'}`}
                 onClick={handleAdd}
                 disabled={!isValid || submitting}
               >
@@ -159,4 +156,6 @@ export default function AddEmployeeModal({ onClose, onAdd }: Props) {
       </div>
     </>
   );
-}
+};
+
+export default AddEmployeeModal;

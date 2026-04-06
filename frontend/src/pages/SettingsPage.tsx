@@ -1,6 +1,6 @@
 import { useTheme } from '../context/ThemeContext';
 
-export default function SettingsPage() {
+const SettingsPage = () => {
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -25,4 +25,6 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-}
+};
+
+export default SettingsPage;

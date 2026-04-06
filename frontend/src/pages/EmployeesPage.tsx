@@ -6,6 +6,7 @@ import RowActionsMenu from '../components/RowActionsMenu';
 import { useTheme } from '../context/ThemeContext';
 import { useEmployees } from '../hooks/useEmployees';
 import useClickOutside from '../hooks/useClickOutside';
+import useLocalStorage from '../hooks/useLocalStorage';
 import config from '../config';
 
 const API_BASE = config.apiBaseUrl;
@@ -15,7 +16,7 @@ const EmployeesPage = () => {
   const queryClient = useQueryClient();
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [itemsPerPage, setItemsPerPage] = useLocalStorage('itemsPerPage', 5);
   const [showAddModal, setShowAddModal] = useState(false);
   const menuRef = useRef<HTMLTableSectionElement>(null);
   const { theme } = useTheme();

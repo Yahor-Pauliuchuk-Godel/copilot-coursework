@@ -1,4 +1,4 @@
-export default function Header() {
+const Header = () => {
   return (
     <nav className="navbar navbar-expand-md bg-body-tertiary shadow-sm">
       <div className="container-fluid">
@@ -8,4 +8,6 @@ export default function Header() {
       </div>
     </nav>
   );
-}
+};
+
+export default Header;
