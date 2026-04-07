@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import AddEmployeeModal from '../components/AddEmployeeModal';
-import Pagination from '../components/Pagination';
-import RowActionsMenu from '../components/RowActionsMenu';
-import { useEmployees } from '../hooks/useEmployees';
-import useClickOutside from '../hooks/useClickOutside';
-import useLocalStorage from '../hooks/useLocalStorage';
-import config from '../config';
+import AddEmployeeModal from '../../components/AddEmployeeModal';
+import Pagination from '../../components/Pagination';
+import RowActionsMenu from '../../components/RowActionsMenu';
+import { useEmployees } from '../../hooks/employees/useEmployees';
+import useClickOutside from '../../hooks/useClickOutside';
+import useLocalStorage from '../../hooks/useLocalStorage';
+import config from '../../config';
 
 const API_BASE = config.apiBaseUrl;
 
@@ -65,7 +65,7 @@ const EmployeesPage = () => {
       )}
 
       <div className="mb-3 d-flex justify-content-between align-items-center">
-        <h2 className="mb-0">Employees</h2>
+        <h4 className="mb-0">Employees</h4>
         <button
           className="btn btn-outline-primary"
           onClick={() => setShowAddModal(true)}
@@ -82,7 +82,7 @@ const EmployeesPage = () => {
       ) : (
         <>
         <table className="table table-striped table-hover align-middle">
-          <thead className="table-dark">
+          <thead>
             <tr>
               <th>#</th>
               <th>Name</th>

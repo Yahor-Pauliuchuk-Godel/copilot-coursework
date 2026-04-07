@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { useEmployee } from '../hooks/useEmployee';
-import config from '../config';
+import { useEmployee } from '../../hooks/employees/useEmployee';
+import config from '../../config';
 
 const API_BASE = config.apiBaseUrl;
 

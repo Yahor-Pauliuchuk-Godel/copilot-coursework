@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import EmployeesIcon from '../assets/icons/Employees.svg';
 import SettingsIcon from '../assets/icons/Settings.svg';
-import './Sidebar.css';
+import '../styles/Sidebar.css';
 
 const Sidebar = () => {
   return (
@@ -13,7 +13,6 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `nav-link text-body d-flex flex-column align-items-center${isActive ? ' nav-link-active' : ''}`
             }
-            end
           >
             <img src={EmployeesIcon} alt="" width={24} height={24} className="mb-1" />
             <span>Employees</span>

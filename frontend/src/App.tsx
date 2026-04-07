@@ -1,11 +1,11 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Header from './components/Header';
+import Header from './components/header/Header';
 import Sidebar from './components/Sidebar';
-import EmployeesPage from './pages/EmployeesPage';
-import EmployeeDetailPage from './pages/EmployeeDetailPage';
+import EmployeesPage from './pages/employees/EmployeesPage';
+import EmployeeDetailPage from './pages/employees/EmployeeDetailPage';
 import SettingsPage from './pages/SettingsPage';
 
-export default function App() {
+const App = () => {
   return (
     <div className="d-flex flex-column min-vh-100">
       <Header />
@@ -22,4 +22,6 @@ export default function App() {
       </div>
     </div>
   );
-}
+};
+
+export default App;
