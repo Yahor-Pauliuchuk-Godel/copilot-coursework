@@ -1,4 +1,4 @@
-import { useLocation, useMatch } from 'react-router-dom';
+import { Link, useLocation, useMatch } from 'react-router-dom';
 import EmployeesIcon from '../../assets/icons/Employees.svg';
 import SettingsIcon from '../../assets/icons/Settings.svg';
 
@@ -10,8 +10,19 @@ const Breadcrumb = () => {
     return (
       <>
         <span className="vr mx-3" />
-        <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
-        <span className="text-body">{`Employees / Details: ${detailMatch.params.id}`}</span>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb mb-0">
+            <li className="breadcrumb-item">
+              <Link to="/employees">
+                <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
+                Employees
+              </Link>
+            </li>
+            <li className="breadcrumb-item active" aria-current="page">
+              {`Details: ${detailMatch.params.id}`}
+            </li>
+          </ol>
+        </nav>
       </>
     );
   }
@@ -20,8 +31,14 @@ const Breadcrumb = () => {
     return (
       <>
         <span className="vr mx-3" />
-        <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
-        <span className="text-body">Employees</span>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb mb-0">
+            <li className="breadcrumb-item active" aria-current="page">
+              <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
+              Employees
+            </li>
+          </ol>
+        </nav>
       </>
     );
   }
@@ -30,8 +47,14 @@ const Breadcrumb = () => {
     return (
       <>
         <span className="vr mx-3" />
-        <img src={SettingsIcon} alt="" width={20} height={20} className="me-2" />
-        <span className="text-body">Settings</span>
+        <nav aria-label="breadcrumb">
+          <ol className="breadcrumb mb-0">
+            <li className="breadcrumb-item active" aria-current="page">
+              <img src={SettingsIcon} alt="" width={20} height={20} className="me-2" />
+              Settings
+            </li>
+          </ol>
+        </nav>
       </>
     );
   }
