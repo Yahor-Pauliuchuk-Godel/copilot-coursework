@@ -8,31 +8,9 @@ applyTo: "frontend/**"
 
 **Always use `const` arrow functions** instead of `function` declarations for components and helpers.
 
-```tsx
-// ✓ Correct
-const MyComponent = () => { ... };
-const handleClick = () => { ... };
-
-// ✗ Incorrect
-function MyComponent() { ... }
-function handleClick() { ... }
-```
-
 ## Styling — CRITICAL RULE
 
 **Never use inline CSS** (`style={{ ... }}`). Always prefer a Bootstrap utility class. If no Bootstrap equivalent exists, add the rule to a dedicated `.css` file and import it into the component.
-
-```tsx
-// ✓ Correct — Bootstrap utility class
-<nav className="navbar shadow-sm">
-
-// ✓ Correct — custom class in a separate CSS file
-import './Header.css';
-<nav className="navbar header-shadow">
-
-// ✗ Incorrect — inline style
-<nav style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.15)' }}>
-```
 
 ## Custom Hooks — Best Practices
 

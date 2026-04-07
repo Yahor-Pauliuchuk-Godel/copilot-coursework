@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import config from '../config';
+import config from '../../config';
 import type { Employee } from './useEmployees';
 
 const fetchEmployee = async (id: number): Promise<Employee> => {

@@ -5,7 +5,7 @@ const SettingsPage = () => {
 
   return (
     <div>
-      <h1>Settings</h1>
+      <h4>Settings</h4>
 
       <div className="mt-4">
         <h5>Appearance</h5>

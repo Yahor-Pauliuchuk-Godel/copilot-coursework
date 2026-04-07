@@ -2,8 +2,8 @@ import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import config from '../config';
-import type { Employee } from '../hooks/useEmployees';
-import './AddEmployeeModal.css';
+import type { Employee } from '../hooks/employees/useEmployees';
+import '../styles/AddEmployeeModal.css';
 
 const API_BASE = config.apiBaseUrl;
 
