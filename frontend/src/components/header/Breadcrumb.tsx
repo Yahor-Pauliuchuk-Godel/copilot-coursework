@@ -14,7 +14,7 @@ const Breadcrumb = () => {
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item">
               <Link to="/employees">
-                <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
+                <img src={EmployeesIcon} alt="" role="presentation" width={20} height={20} className="me-2" />
                 Employees
               </Link>
             </li>
@@ -34,7 +34,7 @@ const Breadcrumb = () => {
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item active" aria-current="page">
-              <img src={EmployeesIcon} alt="" width={20} height={20} className="me-2" />
+              <img src={EmployeesIcon} alt="" role="presentation" width={20} height={20} className="me-2" />
               Employees
             </li>
           </ol>
@@ -50,7 +50,7 @@ const Breadcrumb = () => {
         <nav aria-label="breadcrumb">
           <ol className="breadcrumb mb-0">
             <li className="breadcrumb-item active" aria-current="page">
-              <img src={SettingsIcon} alt="" width={20} height={20} className="me-2" />
+              <img src={SettingsIcon} alt="" role="presentation" width={20} height={20} className="me-2" />
               Settings
             </li>
           </ol>
