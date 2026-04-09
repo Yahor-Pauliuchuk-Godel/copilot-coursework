@@ -1,4 +1,5 @@
 using Backend.Data;
+using Backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,11 +21,16 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddScoped<IEmployeeDocumentService, EmployeeDocumentService>();
+builder.Services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+
 // ── Pipeline ─────────────────────────────────────────────────────────────────
 
 var app = builder.Build();
 
 app.UseCors("AllowFrontend");
+
+app.UseStaticFiles();
 
 app.MapControllers();
 
