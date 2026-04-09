@@ -23,3 +23,12 @@ When the model changes:
    ```
 
 > The `AppDbContextModelSnapshot.cs` file is auto-updated by EF when generating a migration — do not edit it manually.
+
+## Controller Conventions
+
+- Controllers must not make direct database calls. Inject and use service interfaces instead.
+- Keep controllers thin: validate input, delegate to services, return results.
+
+## Code Style
+
+- Do not leave unused `using` directives in any file.
