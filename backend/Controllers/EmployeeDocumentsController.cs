@@ -1,4 +1,5 @@
 ﻿using Backend.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Backend.Controllers;
@@ -36,7 +37,7 @@ public class EmployeeDocumentsController : ControllerBase
 
     // POST api/employees/5/documents
     [HttpPost]
-    public async Task<IActionResult> Upload(int employeeId, IFormFile file)
+    public async Task<IActionResult> Upload(int employeeId, [FromForm] IFormFile file)
     {
         if (!await _service.EmployeeExistsAsync(employeeId)) return NotFound();
         if (file is null || file.Length == 0) return BadRequest("No file provided.");

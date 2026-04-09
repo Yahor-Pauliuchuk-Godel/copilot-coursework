@@ -22,7 +22,7 @@ public class LocalFileStorageService : IFileStorageService
         await using var stream = File.Create(fullPath);
         await file.CopyToAsync(stream);
 
-        return Path.Combine("uploads", "employees", employeeId.ToString(), storedFileName);
+        return $"uploads/employees/{employeeId}/{storedFileName}";
     }
 
     public string GetFullPath(string storagePath) =>

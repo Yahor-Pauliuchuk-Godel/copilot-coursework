@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<EmployeeDocument>()
             .HasOne(d => d.Employee)
             .WithMany()

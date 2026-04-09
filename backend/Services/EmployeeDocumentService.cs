@@ -53,9 +53,18 @@ public class EmployeeDocumentService : IEmployeeDocumentService
         var document = await _db.EmployeeDocuments.FirstOrDefaultAsync(d => d.Id == id && d.EmployeeId == employeeId);
         if (document is null) return false;
 
-        _storage.Delete(document.StoragePath);
         _db.EmployeeDocuments.Remove(document);
         await _db.SaveChangesAsync();
+
+        try
+        {
+            _storage.Delete(document.StoragePath);
+        }
+        catch (Exception ex)
+        {
+            // Log file deletion failure but don't fail the operation—DB record is already removed
+            System.Diagnostics.Debug.WriteLine($"Warning: Failed to delete file '{document.StoragePath}': {ex.Message}");
+        }
 
         return true;
     }
