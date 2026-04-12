@@ -29,7 +29,7 @@ frontend/.vite/
 # ──────────────────────────────────────────────
 # Uploaded files
 # ──────────────────────────────────────────────
-backend/wwwroot/uploads/employees/
+backend/wwwroot/uploads/
 
 # ──────────────────────────────────────────────
 # OS artifacts
