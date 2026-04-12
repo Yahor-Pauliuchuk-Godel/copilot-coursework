@@ -1,7 +1,7 @@
 interface Props {
   isOpen: boolean;
   onToggle: () => void;
-  onOpen: () => void;
+  onOpen?: () => void;
   onDelete: () => void;
 }
 
@@ -15,11 +15,13 @@ const RowActionsMenu = ({ isOpen, onToggle, onOpen, onDelete }: Props) => (
       &#x22EE;
     </button>
     <ul className={`dropdown-menu dropdown-menu-end${isOpen ? ' show' : ''}`}>
-      <li>
-        <button className="dropdown-item" onClick={onOpen}>
-          Open
-        </button>
-      </li>
+      {onOpen && (
+        <li>
+          <button className="dropdown-item" onClick={onOpen}>
+            Open
+          </button>
+        </li>
+      )}
       <li>
         <button className="dropdown-item text-danger" onClick={onDelete}>
           Delete

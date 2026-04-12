@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Ensure wwwroot exists so WebRootPath is never null on a fresh clone
+Directory.CreateDirectory(Path.Combine(builder.Environment.ContentRootPath, "wwwroot"));
+
 // ── Services ────────────────────────────────────────────────────────────────
 
 builder.Services.AddDbContext<AppDbContext>(options =>
