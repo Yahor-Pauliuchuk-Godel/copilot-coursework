@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import AddDocumentModal from '../../components/AddDocumentModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
 import { useEmployee } from '../../hooks/employees/useEmployee';
@@ -16,6 +18,8 @@ const EmployeeDetailPage = () => {
   const { employee, isLoading, error } = useEmployee(employeeId);
   const { documents, isLoading: docsLoading, error: docsError } = useEmployeeDocuments(employeeId);
 
+  const queryClient = useQueryClient();
+  const [showAddDocModal, setShowAddDocModal] = useState(false);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
@@ -52,8 +56,20 @@ const EmployeeDetailPage = () => {
     currentPage * itemsPerPage,
   );
 
+  const handleDocumentAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+  };
+
   return (
     <div>
+      {showAddDocModal && (
+        <AddDocumentModal
+          employeeId={employeeId}
+          onClose={() => setShowAddDocModal(false)}
+          onAdd={handleDocumentAdded}
+        />
+      )}
+
       <div className="d-flex align-items-center gap-3 mb-4">
         <button className="btn btn-outline-secondary flex-shrink-0" onClick={() => navigate('/employees')}>
           &larr; Back
@@ -70,7 +86,15 @@ const EmployeeDetailPage = () => {
         </div>
       </div>
 
-      <h5>Documents</h5>
+      <div className="mb-3 d-flex justify-content-between align-items-center">
+        <h5 className="mb-0">Documents</h5>
+        <button
+          className="btn btn-outline-primary"
+          onClick={() => setShowAddDocModal(true)}
+        >
+          Add Document
+        </button>
+      </div>
 
       {docsLoading ? (
         <div className="d-flex justify-content-center py-3">
