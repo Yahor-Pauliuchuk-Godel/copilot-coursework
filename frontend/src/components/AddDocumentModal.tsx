@@ -33,7 +33,8 @@ const AddDocumentModal = ({ employeeId, onClose, onAdd }: Props) => {
     setDragOver(true);
   };
 
-  const handleDragLeave = () => {
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
     setDragOver(false);
   };
 

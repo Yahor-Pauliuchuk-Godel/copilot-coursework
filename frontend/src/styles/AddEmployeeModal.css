@@ -1,3 +1,1 @@
-.modal-backdrop-clickable {
-  cursor: default;
-}
+@import './Modal.css';
