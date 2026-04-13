@@ -1,0 +1,30 @@
+@import './Modal.css';
+
+.drop-zone {
+  border: 2px dashed var(--bs-secondary-color);
+  border-radius: 0.375rem;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease-in-out, background-color 0.15s ease-in-out;
+  user-select: none;
+}
+
+.drop-zone:hover {
+  border-color: var(--bs-primary);
+  background-color: rgba(var(--bs-primary-rgb), 0.05);
+}
+
+.drop-zone.drop-zone-active {
+  border-color: var(--bs-primary);
+  background-color: rgba(var(--bs-primary-rgb), 0.08);
+}
+
+.drop-zone-file-selected {
+  border-color: var(--bs-success);
+}
+
+.drop-zone-uploading {
+  pointer-events: none;
+  opacity: 0.7;
+}

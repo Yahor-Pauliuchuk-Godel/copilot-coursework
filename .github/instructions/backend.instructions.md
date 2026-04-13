@@ -4,7 +4,7 @@ applyTo: "backend/**"
 ---
 # Backend Instructions
 
-## EF Core Migrations — CRITICAL RULE
+## EF Core Migrations
 
 **Never edit an existing migration file.** Existing migrations represent the history of applied schema changes.
 

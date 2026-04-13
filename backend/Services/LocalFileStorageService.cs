@@ -13,7 +13,7 @@ public class LocalFileStorageService : IFileStorageService
 
     public async Task<string> SaveAsync(int employeeId, IFormFile file)
     {
-        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "employees", employeeId.ToString());
+        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", employeeId.ToString());
         Directory.CreateDirectory(uploadsFolder);
 
         var storedFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
@@ -22,7 +22,7 @@ public class LocalFileStorageService : IFileStorageService
         await using var stream = File.Create(fullPath);
         await file.CopyToAsync(stream);
 
-        return $"uploads/employees/{employeeId}/{storedFileName}";
+        return $"uploads/{employeeId}/{storedFileName}";
     }
 
     public string GetFullPath(string storagePath) =>

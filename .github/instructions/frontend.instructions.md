@@ -4,15 +4,15 @@ applyTo: "frontend/**"
 ---
 # Frontend Instructions
 
-## Functions — CRITICAL RULE
+## Functions
 
 **Always use `const` arrow functions** instead of `function` declarations for components and helpers.
 
-## Styling — CRITICAL RULE
+## Styling
 
 **Never use inline CSS** (`style={{ ... }}`). Always prefer a Bootstrap utility class. If no Bootstrap equivalent exists, add the rule to a dedicated `.css` file and import it into the component.
 
-## Custom Hooks — Best Practices
+## Custom Hooks
 
 Extract logic into a custom hook when stateful or side-effect logic is reused across multiple components or becomes complex enough to obscure a component's rendering intent.
 
@@ -34,7 +34,7 @@ Extract logic into a custom hook when stateful or side-effect logic is reused ac
 - Always declare every reactive value used inside `useEffect`/`useMemo`/`useCallback` in the dependency array.
 - Use the `exhaustive-deps` ESLint rule to catch omissions automatically.
 
-## Environment Variables — CRITICAL RULE
+## Environment Variables
 
 **Never hardcode API URLs or other environment-specific values** as string literals in source files. Always expose them through the central configuration file.
 
