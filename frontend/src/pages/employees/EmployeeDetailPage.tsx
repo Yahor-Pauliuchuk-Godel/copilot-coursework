@@ -1,7 +1,8 @@
 import { useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AddDocumentModal from '../../components/AddDocumentModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
 import { useEmployee } from '../../hooks/employees/useEmployee';
@@ -20,12 +21,28 @@ const EmployeeDetailPage = () => {
 
   const queryClient = useQueryClient();
   const [showAddDocModal, setShowAddDocModal] = useState(false);
+  const [confirmDeleteDocId, setConfirmDeleteDocId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
+
+  const handleDocumentAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+  };
+
+  const deleteDocMutation = useMutation({
+    mutationFn: async (docId: number) => {
+      const res = await fetch(`${API_BASE}/api/employees/${employeeId}/documents/${docId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+      setConfirmDeleteDocId(null);
+    },
+  });
 
   if (isLoading) {
     return (
@@ -56,10 +73,6 @@ const EmployeeDetailPage = () => {
     currentPage * itemsPerPage,
   );
 
-  const handleDocumentAdded = () => {
-    queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
-  };
-
   return (
     <div>
       {showAddDocModal && (
@@ -67,6 +80,17 @@ const EmployeeDetailPage = () => {
           employeeId={employeeId}
           onClose={() => setShowAddDocModal(false)}
           onAdd={handleDocumentAdded}
+        />
+      )}
+
+      {confirmDeleteDocId !== null && (
+        <ConfirmModal
+          title="Delete Document"
+          description="This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => deleteDocMutation.mutate(confirmDeleteDocId)}
+          onClose={() => setConfirmDeleteDocId(null)}
+          confirming={deleteDocMutation.isPending}
         />
       )}
 
@@ -129,7 +153,7 @@ const EmployeeDetailPage = () => {
                     <RowActionsMenu
                       isOpen={openMenuId === doc.id}
                       onToggle={() => setOpenMenuId(openMenuId === doc.id ? null : doc.id)}
-                      onDelete={() => {}}
+                      onDelete={() => { setOpenMenuId(null); setConfirmDeleteDocId(doc.id); }}
                     />
                   </td>
                 </tr>
