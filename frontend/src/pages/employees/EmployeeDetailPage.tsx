@@ -86,7 +86,7 @@ const EmployeeDetailPage = () => {
       {confirmDeleteDocId !== null && (
         <ConfirmModal
           title="Delete Document"
-          description="This action can not be undone."
+          description="This action cannot be undone."
           confirmLabel="Delete"
           onConfirm={() => deleteDocMutation.mutate(confirmDeleteDocId)}
           onClose={() => setConfirmDeleteDocId(null)}
