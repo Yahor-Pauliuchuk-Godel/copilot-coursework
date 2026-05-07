@@ -1,7 +1,7 @@
 ﻿using Backend.Data;
 using Backend.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Backend.Services;
 
@@ -63,9 +63,31 @@ public class EmployeeDocumentService : IEmployeeDocumentService
         catch (Exception ex)
         {
             // Log file deletion failure but don't fail the operation—DB record is already removed
-            System.Diagnostics.Debug.WriteLine($"Warning: Failed to delete file '{document.StoragePath}': {ex.Message}");
+            Debug.WriteLine($"Warning: Failed to delete file '{document.StoragePath}': {ex.Message}");
         }
 
         return true;
+    }
+
+    public async Task DeleteAllFilesForEmployeeAsync(int employeeId)
+    {
+        var storagePaths = await _db.EmployeeDocuments
+            .Where(d => d.EmployeeId == employeeId)
+            .Select(d => d.StoragePath)
+            .ToListAsync();
+
+        foreach (var path in storagePaths)
+        {
+            try
+            {
+                _storage.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Warning: Failed to delete file '{path}': {ex.Message}");
+            }
+        }
+
+        _storage.DeleteEmployeeFolder(employeeId);
     }
 }

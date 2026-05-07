@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AddEmployeeModal from '../../components/AddEmployeeModal';
 import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
+import Toast from '../../components/Toast';
 import { useEmployees } from '../../hooks/employees/useEmployees';
 import useClickOutside from '../../hooks/useClickOutside';
 import useLocalStorage from '../../hooks/useLocalStorage';
@@ -21,12 +22,20 @@ const EmployeesPage = () => {
   const [itemsPerPage, setItemsPerPage] = useLocalStorage('itemsPerPage', 5);
   const [showAddModal, setShowAddModal] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const handleEmployeeAdded = () => {
     queryClient.invalidateQueries({ queryKey: ['employees'] });
+    setToast({ message: 'Employee added successfully.', type: 'success' });
   };
 
   const deleteMutation = useMutation({
@@ -37,6 +46,10 @@ const EmployeesPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employees'] });
       setConfirmDeleteId(null);
+      setToast({ message: 'Employee deleted successfully.', type: 'success' });
+    },
+    onError: () => {
+      setToast({ message: 'Failed to delete employee. Please try again.', type: 'error' });
     },
   });
 
@@ -70,6 +83,14 @@ const EmployeesPage = () => {
 
   return (
     <div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+
       {showAddModal && (
         <AddEmployeeModal
           onClose={() => setShowAddModal(false)}

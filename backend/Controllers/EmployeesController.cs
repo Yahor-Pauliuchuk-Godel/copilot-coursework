@@ -1,5 +1,6 @@
 using Backend.Data;
 using Backend.Models;
+using Backend.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,10 +11,12 @@ namespace Backend.Controllers;
 public class EmployeesController : ControllerBase
 {
     private readonly AppDbContext _db;
+    private readonly IEmployeeDocumentService _documentService;
 
-    public EmployeesController(AppDbContext db)
+    public EmployeesController(AppDbContext db, IEmployeeDocumentService documentService)
     {
         _db = db;
+        _documentService = documentService;
     }
 
     // GET api/employees
@@ -69,6 +72,8 @@ public class EmployeesController : ControllerBase
     {
         var employee = await _db.Employees.FindAsync(id);
         if (employee is null) return NotFound();
+
+        await _documentService.DeleteAllFilesForEmployeeAsync(id);
 
         _db.Employees.Remove(employee);
         await _db.SaveChangesAsync();

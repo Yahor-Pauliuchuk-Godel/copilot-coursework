@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AddDocumentModal from '../../components/AddDocumentModal';
 import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
+import Toast from '../../components/Toast';
 import { useEmployee } from '../../hooks/employees/useEmployee';
 import { useEmployeeDocuments } from '../../hooks/employees/useEmployeeDocuments';
 import useClickOutside from '../../hooks/useClickOutside';
@@ -25,12 +26,20 @@ const EmployeeDetailPage = () => {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
 
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const handleDocumentAdded = () => {
     queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+    setToast({ message: 'Document added successfully.', type: 'success' });
   };
 
   const deleteDocMutation = useMutation({
@@ -41,6 +50,10 @@ const EmployeeDetailPage = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
       setConfirmDeleteDocId(null);
+      setToast({ message: 'Document deleted successfully.', type: 'success' });
+    },
+    onError: () => {
+      setToast({ message: 'Failed to delete document. Please try again.', type: 'error' });
     },
   });
 
@@ -75,6 +88,14 @@ const EmployeeDetailPage = () => {
 
   return (
     <div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+
       {showAddDocModal && (
         <AddDocumentModal
           employeeId={employeeId}

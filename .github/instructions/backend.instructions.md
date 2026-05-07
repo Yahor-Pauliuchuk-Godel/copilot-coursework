@@ -32,3 +32,4 @@ When the model changes:
 ## Code Style
 
 - Do not leave unused `using` directives in any file.
+- Never use fully-qualified type names (e.g. `System.Diagnostics.Debug.WriteLine`) when a `using` directive can be added instead.

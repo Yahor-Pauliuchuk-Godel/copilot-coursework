@@ -10,4 +10,5 @@ public interface IEmployeeDocumentService
     Task<EmployeeDocument?> GetByIdAsync(int employeeId, int id);
     Task<EmployeeDocumentDto> UploadAsync(int employeeId, IFormFile file);
     Task<bool> DeleteAsync(int employeeId, int id);
+    Task DeleteAllFilesForEmployeeAsync(int employeeId);
 }
