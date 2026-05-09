@@ -51,7 +51,7 @@ const ConfirmModal = ({ title, description, confirmLabel, onConfirm, onClose, co
                 {confirming ? (
                   <>
                     <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
-                    Deleting…
+                    {confirmLabel}…
                   </>
                 ) : (
                   confirmLabel
