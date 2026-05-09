@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AddDocumentModal from '../../components/AddDocumentModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
+import Toast from '../../components/Toast';
 import { useEmployee } from '../../hooks/employees/useEmployee';
 import { useEmployeeDocuments } from '../../hooks/employees/useEmployeeDocuments';
 import useClickOutside from '../../hooks/useClickOutside';
@@ -20,12 +22,40 @@ const EmployeeDetailPage = () => {
 
   const queryClient = useQueryClient();
   const [showAddDocModal, setShowAddDocModal] = useState(false);
+  const [confirmDeleteDocId, setConfirmDeleteDocId] = useState<number | null>(null);
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(5);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const handleDocumentAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+    setToast({ message: 'Document added successfully.', type: 'success' });
+  };
+
+  const deleteDocMutation = useMutation({
+    mutationFn: async (docId: number) => {
+      const res = await fetch(`${API_BASE}/api/employees/${employeeId}/documents/${docId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
+      setConfirmDeleteDocId(null);
+      setToast({ message: 'Document deleted successfully.', type: 'success' });
+    },
+    onError: () => {
+      setToast({ message: 'Failed to delete document. Please try again.', type: 'error' });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -56,17 +86,32 @@ const EmployeeDetailPage = () => {
     currentPage * itemsPerPage,
   );
 
-  const handleDocumentAdded = () => {
-    queryClient.invalidateQueries({ queryKey: ['employeeDocuments', employeeId] });
-  };
-
   return (
     <div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+
       {showAddDocModal && (
         <AddDocumentModal
           employeeId={employeeId}
           onClose={() => setShowAddDocModal(false)}
           onAdd={handleDocumentAdded}
+        />
+      )}
+
+      {confirmDeleteDocId !== null && (
+        <ConfirmModal
+          title="Delete Document"
+          description="This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => deleteDocMutation.mutate(confirmDeleteDocId)}
+          onClose={() => setConfirmDeleteDocId(null)}
+          confirming={deleteDocMutation.isPending}
         />
       )}
 
@@ -129,7 +174,7 @@ const EmployeeDetailPage = () => {
                     <RowActionsMenu
                       isOpen={openMenuId === doc.id}
                       onToggle={() => setOpenMenuId(openMenuId === doc.id ? null : doc.id)}
-                      onDelete={() => {}}
+                      onDelete={() => { setOpenMenuId(null); setConfirmDeleteDocId(doc.id); }}
                     />
                   </td>
                 </tr>

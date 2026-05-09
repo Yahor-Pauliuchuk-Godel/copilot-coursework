@@ -37,4 +37,11 @@ public class LocalFileStorageService : IFileStorageService
         if (File.Exists(fullPath))
             File.Delete(fullPath);
     }
+
+    public void DeleteEmployeeFolder(int employeeId)
+    {
+        var folder = Path.Combine(_env.WebRootPath, "uploads", employeeId.ToString());
+        if (Directory.Exists(folder))
+            Directory.Delete(folder, recursive: true);
+    }
 }

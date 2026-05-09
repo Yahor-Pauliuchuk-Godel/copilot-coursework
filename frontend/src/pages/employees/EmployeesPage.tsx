@@ -1,9 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import AddEmployeeModal from '../../components/AddEmployeeModal';
+import ConfirmModal from '../../components/ConfirmModal';
 import Pagination from '../../components/Pagination';
 import RowActionsMenu from '../../components/RowActionsMenu';
+import Toast from '../../components/Toast';
 import { useEmployees } from '../../hooks/employees/useEmployees';
 import useClickOutside from '../../hooks/useClickOutside';
 import useLocalStorage from '../../hooks/useLocalStorage';
@@ -19,9 +21,37 @@ const EmployeesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useLocalStorage('itemsPerPage', 5);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
   const menuRef = useRef<HTMLTableSectionElement>(null);
 
   useClickOutside(menuRef, () => setOpenMenuId(null));
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+  const handleEmployeeAdded = () => {
+    queryClient.invalidateQueries({ queryKey: ['employees'] });
+    setToast({ message: 'Employee added successfully.', type: 'success' });
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`${API_BASE}/api/employees/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['employees'] });
+      setConfirmDeleteId(null);
+      setToast({ message: 'Employee deleted successfully.', type: 'success' });
+    },
+    onError: () => {
+      setToast({ message: 'Failed to delete employee. Please try again.', type: 'error' });
+    },
+  });
 
   if (isLoading) {
     return (
@@ -45,10 +75,6 @@ const EmployeesPage = () => {
     );
   }
 
-  const handleEmployeeAdded = () => {
-    queryClient.invalidateQueries({ queryKey: ['employees'] });
-  };
-
   const totalPages = Math.max(1, Math.ceil(employees.length / itemsPerPage));
   const pagedEmployees = employees.slice(
     (currentPage - 1) * itemsPerPage,
@@ -57,10 +83,29 @@ const EmployeesPage = () => {
 
   return (
     <div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onDismiss={() => setToast(null)}
+        />
+      )}
+
       {showAddModal && (
         <AddEmployeeModal
           onClose={() => setShowAddModal(false)}
           onAdd={handleEmployeeAdded}
+        />
+      )}
+
+      {confirmDeleteId !== null && (
+        <ConfirmModal
+          title="Delete Employee"
+          description="This action cannot be undone."
+          confirmLabel="Delete"
+          onConfirm={() => deleteMutation.mutate(confirmDeleteId)}
+          onClose={() => setConfirmDeleteId(null)}
+          confirming={deleteMutation.isPending}
         />
       )}
 
@@ -108,7 +153,7 @@ const EmployeesPage = () => {
                     isOpen={openMenuId === employee.id}
                     onToggle={() => setOpenMenuId(openMenuId === employee.id ? null : employee.id)}
                     onOpen={() => navigate(`/employees/${employee.id}`)}
-                    onDelete={() => {}}
+                    onDelete={() => { setOpenMenuId(null); setConfirmDeleteId(employee.id); }}
                   />
                 </td>
               </tr>

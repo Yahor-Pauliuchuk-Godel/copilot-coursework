@@ -36,7 +36,6 @@ const Breadcrumb = () => {
 
   return (
     <>
-      <span className="vr mx-3" />
       <nav aria-label="breadcrumb" className="d-flex align-items-center">
         {matched.parent && (
           <>

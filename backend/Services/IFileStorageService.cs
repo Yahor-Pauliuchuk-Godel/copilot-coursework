@@ -8,4 +8,5 @@ public interface IFileStorageService
     string GetFullPath(string storagePath);
     bool Exists(string storagePath);
     void Delete(string storagePath);
+    void DeleteEmployeeFolder(int employeeId);
 }
