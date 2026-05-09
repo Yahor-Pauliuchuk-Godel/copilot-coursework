@@ -7,10 +7,10 @@ import SettingsPage from './pages/SettingsPage';
 
 const App = () => {
   return (
-    <div className="d-flex flex-column min-vh-100">
-      <Header />
-      <div className="d-flex flex-grow-1">
-        <Sidebar />
+    <div className="d-flex min-vh-100">
+      <Sidebar />
+      <div className="d-flex flex-column flex-grow-1">
+        <Header />
         <main className="flex-grow-1 p-4">
           <Routes>
             <Route path="/" element={<Navigate to="/employees" replace />} />
