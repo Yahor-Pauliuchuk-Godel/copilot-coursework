@@ -121,8 +121,7 @@ const EmployeesPage = () => {
 
       {employees.length === 0 ? (
         <div className="alert alert-info">
-          No employees found. Add some via the API with a POST to{' '}
-          <code>{API_BASE}/api/employees</code>.
+          No employees found.
         </div>
       ) : (
         <>
