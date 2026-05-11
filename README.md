@@ -1,6 +1,6 @@
-# Full-Stack Starter Template
+# Employee Document Manager
 
-A minimal full-stack starter with a **React 18 + Vite + TypeScript** frontend and a **.NET 8 ASP.NET Core Web API** backend backed by **SQL Server via EF Core**.
+A full-stack application for managing employee profiles and their associated documents — upload, download, and delete files per employee. Built with a **React 18 + Vite + TypeScript** frontend and a **.NET 8 ASP.NET Core Web API** backend backed by **SQL Server via EF Core**.
 
 ---
 
@@ -9,32 +9,33 @@ A minimal full-stack starter with a **React 18 + Vite + TypeScript** frontend an
 ```
 copilot-coursework/
 ├── backend/
-│   ├── Backend.csproj
-│   ├── Program.cs
-│   ├── appsettings.json
-│   ├── appsettings.Development.json
-│   ├── Controllers/
-│   │   └── EmployeesController.cs
+│   ├── Program.cs           ← App entry point, DI registration, middleware
+│   ├── appsettings.json     ← Connection string and app configuration
+│   ├── Controllers/         ← CRUD and document API endpoints
 │   ├── Data/
-│   │   └── AppDbContext.cs
-│   └── Models/
-│       └── Employee.cs
+│   │   └── AppDbContext.cs  ← EF Core DbContext with Employees and EmployeeDocuments
+│   ├── Migrations/          ← EF Core migration files
+│   ├── Models/              ← Entity and DTO definitions
+│   ├── Services/            ← Document and file storage services
+│   └── wwwroot/
+│       └── uploads/         ← Uploaded files organised by employee ID
 └── frontend/
-    ├── index.html
-    ├── package.json
-    ├── tsconfig.json
-    ├── tsconfig.node.json
-    ├── vite.config.ts
+    ├── vite.config.ts       ← Vite config with API proxy
     └── src/
-        ├── main.tsx            ← Bootstrap CSS imported here
-        ├── App.tsx             ← React Router routes
+        ├── main.tsx         ← Bootstrap CSS imported here
+        ├── App.tsx          ← React Router routes
+        ├── config.ts        ← API base URL config
+        ├── assets/
+        │   └── icons/       ← SVG icons used in the sidebar and breadcrumb
         ├── components/
-        │   └── NavBar.tsx
+        │   └── header/      ← Header and breadcrumb navigation
         ├── context/
-        │   └── AppContext.tsx  ← Global state via useState + useContext
-        └── pages/
-            ├── HomePage.tsx
-            └── EmployeesPage.tsx   ← Fetches /api/employees and renders a table
+        │   └── ThemeContext.tsx  ← Light / dark theme state via useContext
+        ├── hooks/           ← Custom React hooks and React Query data fetchers
+        ├── pages/
+        │   ├── employees/   ← Employee list and detail pages
+        │   └── SettingsPage.tsx  ← Theme toggle
+        └── styles/          ← Component-scoped CSS files
 ```
 
 ---
@@ -66,7 +67,7 @@ Open `backend/appsettings.json` and update the `DefaultConnection` value to matc
 
 ```json
 "ConnectionStrings": {
-  "DefaultConnection": "Server=localhost;Database=StarterDb;Trusted_Connection=True;TrustServerCertificate=True;"
+  "DefaultConnection": "Server=localhost;Database=DocManage;Trusted_Connection=True;TrustServerCertificate=True;"
 }
 ```
 
@@ -74,29 +75,17 @@ Common alternatives:
 
 | Scenario | Connection string |
 |---|---|
-| LocalDB | `Server=(localdb)\\mssqllocaldb;Database=StarterDb;Trusted_Connection=True;` |
-| SQL Server Express | `Server=.\\SQLEXPRESS;Database=StarterDb;Trusted_Connection=True;TrustServerCertificate=True;` |
-| SQL Server with login | `Server=localhost;Database=StarterDb;User Id=sa;Password=YourPassword;TrustServerCertificate=True;` |
+| LocalDB | `Server=(localdb)\\mssqllocaldb;Database=DocManage;Trusted_Connection=True;` |
+| SQL Server Express | `Server=.\\SQLEXPRESS;Database=DocManage;Trusted_Connection=True;TrustServerCertificate=True;` |
+| SQL Server with login | `Server=localhost;Database=DocManage;User Id=sa;Password=YourPassword;TrustServerCertificate=True;` |
 
-### 1.3 Create and apply EF Core migrations
+### 1.3 Apply EF Core migrations
 
 ```powershell
-# Still inside the backend folder
-dotnet ef migrations add InitialCreate
 dotnet ef database update
 ```
 
-This creates the `StarterDb` database and the `Employees` table.
-
-### 1.4 Run the backend
-
-```powershell
-dotnet run
-```
-
-The API listens on:
-- **https://localhost:5001** (HTTPS)
-- **http://localhost:5000** (HTTP)
+This creates the database and applies all migrations.
 
 #### Available endpoints
 
@@ -106,19 +95,11 @@ The API listens on:
 | `GET` | `/api/employees/{id}` | Get a single employee |
 | `POST` | `/api/employees` | Create an employee |
 | `PUT` | `/api/employees/{id}` | Update an employee |
-| `DELETE` | `/api/employees/{id}` | Delete an employee |
-
-#### Quick test (PowerShell)
-
-```powershell
-# Create an employee
-Invoke-RestMethod -Method Post -Uri https://localhost:5001/api/employees `
-  -ContentType "application/json" `
-  -Body '{"name":"Jane Smith","dateOfBirth":"1990-06-15"}'
-
-# List all employees
-Invoke-RestMethod https://localhost:5001/api/employees
-```
+| `DELETE` | `/api/employees/{id}` | Delete an employee (also deletes all their documents) |
+| `GET` | `/api/employees/{id}/documents` | List documents for an employee |
+| `GET` | `/api/employees/{id}/documents/{docId}` | Download a document |
+| `POST` | `/api/employees/{id}/documents` | Upload a document |
+| `DELETE` | `/api/employees/{id}/documents/{docId}` | Delete a document |
 
 ---
 
@@ -131,15 +112,7 @@ cd frontend
 npm install
 ```
 
-### 2.2 Run the dev server
-
-```powershell
-npm run dev
-```
-
-The app is available at **http://localhost:5173**.
-
-### 2.3 Build for production
+### 2.2 Build for production
 
 ```powershell
 npm run build   # outputs to frontend/dist/
@@ -147,9 +120,15 @@ npm run build   # outputs to frontend/dist/
 
 ---
 
-## 3 — Running both together
+## 3 — Running the app
 
-Open two terminals:
+The easiest way is to use the provided script from the repo root, which opens both processes in separate terminal windows:
+
+```powershell
+.\run-app.ps1
+```
+
+Alternatively, open two terminals manually:
 
 ```powershell
 # Terminal 1 — backend
@@ -161,18 +140,7 @@ cd frontend
 npm run dev
 ```
 
-Then open **http://localhost:5173** in your browser. The **Employees** page calls `https://localhost:5001/api/employees` via the Fetch API and renders the results in a Bootstrap table.
-
----
-
-## Key design decisions
-
-- **No Swagger / no auth** — kept deliberately minimal.
-- **Bootstrap** is imported as an npm package in `src/main.tsx` (no CDN).
-- **State management** uses `useState` + `useContext` only — no Redux or Zustand.
-- **HTTP calls** use the native `fetch` API only — no axios.
-- **CORS** is locked to `http://localhost:5173` in `Program.cs`.
-- **EF Core Code-First** — edit `Models/Employee.cs`, then run `dotnet ef migrations add <Name>` + `dotnet ef database update` to evolve the schema.
+Then open **http://localhost:5173** in your browser.
 
 ---
 
