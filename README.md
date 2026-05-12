@@ -1,3 +1,9 @@
+# Coursework process
+
+The link below contains screenshots of prompts and their results, UI walkthroughs, and GitHub Copilot customization examples produced during the coursework.
+
+[Screenshots of prompts, results, UI and GitHub Copilot customization examples](https://godelonline-my.sharepoint.com/:p:/r/personal/y_pauliuchuk_godeltech_com/Documents/Copilot%20Course.pptx?d=w30f647b2f3544a3cbcac298830e5557f&csf=1&web=1&e=iEfb0k)
+
 # Employee Document Manager
 
 A full-stack application for managing employee profiles and their associated documents — upload, download, and delete files per employee. Built with a **React 18 + Vite + TypeScript** frontend and a **.NET 8 ASP.NET Core Web API** backend backed by **SQL Server via EF Core**.
